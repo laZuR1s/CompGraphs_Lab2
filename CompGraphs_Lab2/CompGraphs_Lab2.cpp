@@ -28,7 +28,13 @@
 #include "framework.h"
 #include "CompGraphs_Lab2.h"
 #include <cmath>
+#include "Mesh.h"
+#include "Renderer.h"
+
 #define MAX_LOADSTRING 100
+
+Mesh mesh;
+Renderer renderer;
 
 // Глобальные переменные:
 HINSTANCE hInst;                                // текущий экземпляр
@@ -152,7 +158,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_CREATE:
-		SetTimer(hWnd, 1, 30, NULL);
+	{
+		mesh.GenerateHemisphere(300.0f, 35, 35, 90.0f);
+
+		// добавим свет
+		renderer.lights.push_back({ Vector3D(0.0f, 1.0f, -1.0f) });
+		renderer.lights.push_back({ Vector3D(1.0f, 1.0f, 0.0f) });
+
+		// нормализуем направления света
+		for (auto& light : renderer.lights)
+		{
+			light.direction.Normalize();
+		}
+
+		// таймер для анимации
+		SetTimer(hWnd, 1, 10, NULL);
+	}
 		break;
 	case WM_COMMAND:
 	{
@@ -176,11 +197,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
 
+		RECT rect;
+		GetClientRect(hWnd, &rect);
 
+		// создаём буфер
+		HDC memDC = CreateCompatibleDC(hdc);
+		HBITMAP memBitmap = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);
+		HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, memBitmap);
 
+		// очищаем фон (уже без мерцания)
+		HBRUSH bgBrush = CreateSolidBrush(RGB(255,255, 255));
+		FillRect(memDC, &rect, bgBrush);
+		DeleteObject(bgBrush);
 
-		// TODO: Добавьте сюда любой код прорисовки, использующий HDC...
+		// рисуем В БУФЕР
+		renderer.Render(memDC, mesh);
+
+		// копируем в окно
+		BitBlt(hdc, 0, 0, rect.right, rect.bottom, memDC, 0, 0, SRCCOPY);
+
+		// чистим
+		SelectObject(memDC, oldBitmap);
+		DeleteObject(memBitmap);
+		DeleteDC(memDC);
+
 		EndPaint(hWnd, &ps);
+	}
+	break;
+	case WM_TIMER:
+	{
+		renderer.angleX += 0.02f;
+		renderer.angleY += 0.01f;
+
+		InvalidateRect(hWnd, NULL, FALSE);
+
 	}
 	break;
 	case WM_DESTROY:

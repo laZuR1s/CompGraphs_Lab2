@@ -8,6 +8,7 @@ void Mesh::GenerateHemisphere(float radius, int slices, int stacks, float angleL
 
 	float pi = 3.1415926f;
 
+
 	float maxPhi = angleLimit * pi / 180.0f;
 
 	for (int i = 0; i <= stacks; i++)
@@ -41,5 +42,33 @@ void Mesh::GenerateHemisphere(float radius, int slices, int stacks, float angleL
 			faces.push_back(f1);
 			faces.push_back(f2);
 		}
+	}
+
+	float yCap = radius * cos(maxPhi);
+	Point3D center(0.0f, yCap, 0.0f);
+
+	vertices.push_back(center);
+	int centerIndex = vertices.size() - 1;
+
+	// индекс последнего кольца
+	int lastRingStart = stacks * (slices + 1);
+
+	for (int i = 0; i < slices; i++)
+	{
+		int current = lastRingStart + i;
+		int next = lastRingStart + (i + 1) % slices;
+
+		Face capFace;
+
+		// важно: порядок влияет на нормаль
+		capFace.indices = { current, next, centerIndex };
+
+		faces.push_back(capFace);
+	}
+
+
+	for (auto& face : faces)
+	{
+		face.CalculateNormal(vertices);
 	}
 }

@@ -133,6 +133,7 @@
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Point3D.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Vector3D.h" />
@@ -143,6 +144,7 @@
     <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Point3D.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Vector3D.cpp" />
   </ItemGroup>
   <ItemGroup>

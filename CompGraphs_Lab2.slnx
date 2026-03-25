@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="CompGraphs_Lab2/CompGraphs_Lab2.vcxproj" />
+  <Project Path="CompGraphs_Lab2/CompGraphs_Lab2.vcxproj" Id="a24195d6-3433-4be0-a4a2-692f56d5e651" />
 </Solution>

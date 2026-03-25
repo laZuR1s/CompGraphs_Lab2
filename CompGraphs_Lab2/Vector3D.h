@@ -12,4 +12,4 @@ public:
 	void Normalize();
 
 	float Dot(const Vector3D& other) const;
-}
+};
