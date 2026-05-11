@@ -7,13 +7,25 @@ Point3D Project(const Point3D& p)
     return Point3D(p.x, p.y, 0);
 }
 
-    COLORREF GetColor(const Vector3D& normal, const std::vector<Light>& lights)
-    {
-   float intensity = 0.0f;
+COLORREF GetColor(Point3D p1, Point3D p2, Point3D p3,
+    const Vector3D& normal,
+    const std::vector<Light>& lights)
+{
+    // центр треугольника
+    Point3D center(
+        (p1.x + p2.x + p3.x) / 3,
+        (p1.y + p2.y + p3.y) / 3,
+        (p1.z + p2.z + p3.z) / 3
+    );
+
+    float intensity = 0.0f;
 
     for (const auto& light : lights)
     {
-        float dot = normal.Dot(light.direction);
+        Vector3D lightDir = MathUtils::Subtract(light.position, center);
+        lightDir.Normalize();
+
+        float dot = normal.Dot(lightDir);
 
         if (dot > 0)
             intensity += dot;
@@ -22,21 +34,19 @@ Point3D Project(const Point3D& p)
     if (intensity > 1.0f)
         intensity = 1.0f;
 
-    // базовый цвет шара (можешь поменять)
+    float ambient = 0.2f;
+    intensity = ambient + (1 - ambient) * intensity;
+
     int baseR = 180;
     int baseG = 100;
     int baseB = 255;
-
-    float ambient = 0.2f;
-
-    intensity = ambient + (1 - ambient) * intensity;
 
     int r = (int)(baseR * intensity);
     int g = (int)(baseG * intensity);
     int b = (int)(baseB * intensity);
 
     return RGB(r, g, b);
-    }
+}
 
 void DrawTriangle(HDC hdc, Point3D p1, Point3D p2, Point3D p3)
 {
@@ -70,7 +80,7 @@ void Renderer::Render(HDC hdc,  Mesh& mesh)
         p3 = Project(p3);
 
         // свет
-        COLORREF color = GetColor(face.normal, lights);
+        COLORREF color = GetColor(p1, p2, p3, face.normal, lights);
 
         HBRUSH brush = CreateSolidBrush(color);
         HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);

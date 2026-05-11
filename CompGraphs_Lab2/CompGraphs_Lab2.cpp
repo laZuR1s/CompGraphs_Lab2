@@ -162,14 +162,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		mesh.GenerateHemisphere(300.0f, 35, 35, 90.0f);
 
 		// добавим свет
-		renderer.lights.push_back({ Vector3D(0.0f, 1.0f, -1.0f) });
-		renderer.lights.push_back({ Vector3D(1.0f, 1.0f, 0.0f) });
+		renderer.lights.clear();
 
-		// нормализуем направления света
-		for (auto& light : renderer.lights)
-		{
-			light.direction.Normalize();
-		}
+		// теперь задаём ПОЗИЦИИ источников света
+		renderer.lights.push_back(Light(Point3D(0, 200, -300)));
+		renderer.lights.push_back(Light(Point3D(200, 100, -200)));
 
 		// таймер для анимации
 		SetTimer(hWnd, 1, 10, NULL);
@@ -226,8 +223,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_TIMER:
 	{
-		renderer.angleX += 0.02f;
-		renderer.angleY += 0.01f;
+		renderer.angleX += 0.002f;
+		renderer.angleY += 0.001f;
 
 		InvalidateRect(hWnd, NULL, FALSE);
 
@@ -236,7 +233,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
-	
+	case WM_KEYDOWN:
+	{
+		switch (wParam)
+		{
+		case 'W': renderer.lights[0].position.y += 50; break;
+		case 'S': renderer.lights[0].position.y -= 50; break;
+
+		case 'A': renderer.lights[0].position.x -= 50; break;
+		case 'D': renderer.lights[0].position.x += 50; break;
+
+		case 'Q': renderer.lights[0].position.z += 50; break;
+		case 'E': renderer.lights[0].position.z -= 50; break;
+		}
+
+		InvalidateRect(hWnd, NULL, FALSE);
+	}
+	break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}

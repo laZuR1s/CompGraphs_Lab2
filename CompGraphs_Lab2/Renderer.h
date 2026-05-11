@@ -10,7 +10,9 @@
 
 
 struct Light {
-	Vector3D direction;
+	Point3D position;
+
+	Light(Point3D pos) : position(pos) {}
 };
 
 class Renderer {
